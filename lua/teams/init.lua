@@ -16,17 +16,23 @@ function M.start_server(port)
 	server:bind("0.0.0.0", port)
 	server:listen(128, function(err)
 		if err then
-			vim.notify("[team.nvim] Erro no servidor: " .. err, vim.log.levels.ERROR)
+			vim.schedule(function()
+				vim.notify("[team.nvim] Erro no servidor: " .. err, vim.log.levels.ERROR)
+			end)
 			return
 		end
 		local peer = uv.new_tcp()
 		server:accept(peer)
 		table.insert(peers, peer)
-		vim.notify("[team.nvim] Novo cliente conectado")
+		vim.schedule(function()
+			vim.notify("[team.nvim] Novo cliente conectado")
+		end)
 
 		peer:read_start(function(err2, chunk)
 			if err2 then
-				vim.notify("[team.nvim] Erro no cliente: " .. err2, vim.log.levels.ERROR)
+				vim.schedule(function()
+					vim.notify("[team.nvim] Erro no cliente: " .. err2, vim.log.levels.ERROR)
+				end)
 				return
 			end
 			if chunk then
@@ -37,7 +43,9 @@ function M.start_server(port)
 			end
 		end)
 	end)
-	vim.notify("[team.nvim] Servidor iniciado na porta " .. port)
+	vim.schedule(function()
+		vim.notify("[team.nvim] Servidor iniciado na porta " .. port)
+	end)
 end
 
 -- Conecta como cliente TCP
@@ -46,10 +54,14 @@ function M.connect_to_server(host, port)
 	client = uv.new_tcp()
 	client:connect(host, port, function(err)
 		if err then
-			vim.notify("[team.nvim] Erro ao conectar: " .. err, vim.log.levels.ERROR)
+			vim.schedule(function()
+				vim.notify("[team.nvim] Erro ao conectar: " .. err, vim.log.levels.ERROR)
+			end)
 			return
 		end
-		vim.notify("[team.nvim] Conectado a " .. host .. ":" .. port)
+		vim.schedule(function()
+			vim.notify("[team.nvim] Conectado a " .. host .. ":" .. port)
+		end)
 	end)
 end
 
