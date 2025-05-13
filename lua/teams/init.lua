@@ -69,10 +69,13 @@ end
 function M.attach_buffer()
 	vim.api.nvim_buf_attach(0, false, {
 		on_lines = function(_, _, _, first, last, _, new_last)
+			print("[teams.nvim] Detected buffer change")
 			local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 			local msg = vim.fn.json_encode({ lines = lines })
 			if client then
 				client:write(msg)
+				print("[teams.nvim] Enviando mensagem para peer/client:")
+				print(msg)
 			end
 			for _, peer in ipairs(peers) do
 				peer:write(msg)
