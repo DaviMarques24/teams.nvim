@@ -1,4 +1,4 @@
--- team.nvim - MVP inicial para colaboração em tempo real no Neovim
+-- teams.nvim - MVP inicial para colaboração em tempo real no Neovim
 -- Requer Neovim 0.8+ (com suporte a vim.loop)
 
 local uv = vim.loop
@@ -17,7 +17,7 @@ function M.start_server(port)
 	server:listen(128, function(err)
 		if err then
 			vim.schedule(function()
-				vim.notify("[team.nvim] Erro no servidor: " .. err, vim.log.levels.ERROR)
+				vim.notify("[teams.nvim] Erro no servidor: " .. err, vim.log.levels.ERROR)
 			end)
 			return
 		end
@@ -25,13 +25,13 @@ function M.start_server(port)
 		server:accept(peer)
 		table.insert(peers, peer)
 		vim.schedule(function()
-			vim.notify("[team.nvim] Novo cliente conectado")
+			vim.notify("[teams.nvim] Novo cliente conectado")
 		end)
 
 		peer:read_start(function(err2, chunk)
 			if err2 then
 				vim.schedule(function()
-					vim.notify("[team.nvim] Erro no cliente: " .. err2, vim.log.levels.ERROR)
+					vim.notify("[teams.nvim] Erro no cliente: " .. err2, vim.log.levels.ERROR)
 				end)
 				return
 			end
@@ -44,7 +44,7 @@ function M.start_server(port)
 		end)
 	end)
 	vim.schedule(function()
-		vim.notify("[team.nvim] Servidor iniciado na porta " .. port)
+		vim.notify("[teams.nvim] Servidor iniciado na porta " .. port)
 	end)
 end
 
@@ -55,12 +55,12 @@ function M.connect_to_server(host, port)
 	client:connect(host, port, function(err)
 		if err then
 			vim.schedule(function()
-				vim.notify("[team.nvim] Erro ao conectar: " .. err, vim.log.levels.ERROR)
+				vim.notify("[teams.nvim] Erro ao conectar: " .. err, vim.log.levels.ERROR)
 			end)
 			return
 		end
 		vim.schedule(function()
-			vim.notify("[team.nvim] Conectado a " .. host .. ":" .. port)
+			vim.notify("[teams.nvim] Conectado a " .. host .. ":" .. port)
 		end)
 	end)
 end
@@ -84,16 +84,22 @@ function M.attach_buffer()
 	end)
 end
 
--- comandos do usuário
-vim.api.nvim_create_user_command("TeamStart", function(opts)
-	M.start_server(tonumber(opts.args))
-	M.attach_buffer()
-end, { nargs = "?" })
+-- Setup: registra os comandos
+function M.setup()
+	vim.api.nvim_create_user_command("TeamStart", function(opts)
+		M.start_server(tonumber(opts.args))
+		M.attach_buffer()
+	end, { nargs = "?" })
 
-vim.api.nvim_create_user_command("TeamJoin", function(opts)
-	local host, port = string.match(opts.args, "([^:]+):?(%d*)")
-	M.connect_to_server(host, port)
-	M.attach_buffer()
-end, { nargs = 1 })
+	vim.api.nvim_create_user_command("TeamJoin", function(opts)
+		local host, port = string.match(opts.args, "([^:]+):?(%d*)")
+		M.connect_to_server(host, port)
+		M.attach_buffer()
+	end, { nargs = 1 })
+
+	vim.schedule(function()
+		vim.notify("[teams.nvim] setup loaded!")
+	end)
+end
 
 return M
