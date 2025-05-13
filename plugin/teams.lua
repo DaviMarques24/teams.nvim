@@ -1,2 +1,2 @@
 -- plugin/team.lua
-require("teams")
+require("teams").setup()
