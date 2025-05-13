@@ -23,7 +23,7 @@
 ### Packer.nvim
 ```lua
 use {
-  "your-user/team.nvim",
+  "DaviMarques24/teams.nvim",
   config = function()
     require("team").setup()
   end

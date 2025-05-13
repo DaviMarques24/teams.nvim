@@ -67,7 +67,9 @@ function M.attach_buffer()
 			end
 		end,
 	})
-	vim.notify("[team.nvim] Buffer conectado ao time")
+	vim.schedule(function()
+		vim.notify("[teams.nvim] Buffer attached to team")
+	end)
 end
 
 -- comandos do usuário
