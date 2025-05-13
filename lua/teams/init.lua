@@ -66,39 +66,53 @@ function M.connect_to_server(host, port)
 end
 
 -- Observa mudanças no buffer e envia
-function M.attach_buffer()
-	vim.api.nvim_buf_attach(0, false, {
-		on_lines = function(_, _, _, first, last, _, new_last)
-			print("[teams.nvim] Detected buffer change")
-			local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-			local msg = vim.fn.json_encode({ lines = lines })
-			if client then
-				client:write(msg)
-				print("[teams.nvim] Enviando mensagem para peer/client:")
-				print(msg)
-			end
-			for _, peer in ipairs(peers) do
-				peer:write(msg)
-			end
+function M.send_buffer(bufnr)
+	local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+	local msg = vim.fn.json_encode({ lines = lines })
+	if client then
+		client:write(msg)
+	end
+	for _, peer in ipairs(peers) do
+		peer:write(msg)
+	end
+end
+
+function M.attach_buffer(bufnr)
+	bufnr = bufnr or 0
+	vim.api.nvim_buf_attach(bufnr, false, {
+		on_lines = function()
+			M.send_buffer(bufnr)
 		end,
 	})
 	vim.schedule(function()
-		vim.notify("[teams.nvim] Buffer attached to team")
+		vim.notify("[teams.nvim] Buffer " .. bufnr .. " conectado ao time")
 	end)
 end
 
--- Setup: registra os comandos
+-- Setup: registra os comandos e autocmds
 function M.setup()
 	vim.api.nvim_create_user_command("TeamStart", function(opts)
 		M.start_server(tonumber(opts.args))
-		M.attach_buffer()
 	end, { nargs = "?" })
 
 	vim.api.nvim_create_user_command("TeamJoin", function(opts)
 		local host, port = string.match(opts.args, "([^:]+):?(%d*)")
 		M.connect_to_server(host, port)
-		M.attach_buffer()
 	end, { nargs = 1 })
+
+	vim.api.nvim_create_autocmd("BufEnter", {
+		callback = function(args)
+			M.attach_buffer(args.buf)
+		end,
+	})
+
+	-- Envia alterações mesmo durante inserção de texto
+	vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
+		callback = function()
+			local bufnr = vim.api.nvim_get_current_buf()
+			M.send_buffer(bufnr)
+		end,
+	})
 
 	vim.schedule(function()
 		vim.notify("[teams.nvim] setup loaded!")

@@ -1,6 +1,7 @@
+<img src="https://sdmntpreastus.oaiusercontent.com/files/00000000-7ac0-61f9-9292-1d101f6cdde8/raw?se=2025-05-13T21%3A48%3A47Z&sp=r&sv=2024-08-04&sr=b&scid=00000000-0000-0000-0000-000000000000&skoid=31bc9c1a-c7e0-460a-8671-bf4a3c419305&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-05-13T20%3A33%3A03Z&ske=2025-05-14T20%3A33%3A03Z&sks=b&skv=2024-08-04&sig=pN1AgUH9zW/%2BPMsHF00HEokfzWCwIGzxiD10dfnDi40%3D">
+
 # team.nvim
 
-> Real-time collaboration for Neovim via TCP — simple, fast, and minimal.
 
 ## ✨ Overview
 
